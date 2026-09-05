@@ -525,6 +525,11 @@
         #mobileMenu[data-astro-cid-dmqpwcec] .nav-cta[data-astro-cid-dmqpwcec] {
           margin-top: 14px;
           justify-content: center;
+          color: #fff;
+          width: 100%;
+          box-sizing: border-box;
+          white-space: normal;
+          text-align: center;
         }
       }
       .hero[data-astro-cid-bbe6dxrz] {
@@ -1003,21 +1008,39 @@
           grid-template-columns: 1fr;
         }
       }
-      .clients-row[data-astro-cid-2vnzffnj] {
+      .clients-row {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 12px;
       }
-      .client-chip[data-astro-cid-2vnzffnj] {
-        font-family: var(--font-mono);
-        font-size: 13px;
-        letter-spacing: 0.03em;
-        color: var(--ink);
-        background: var(--paper-alt);
+      @media (max-width: 600px) {
+        .clients-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .client-logo {
+          width: 100%;
+          max-width: 280px;
+          margin: 0 auto;
+        }
+      }
+      .client-logo {
+        background: #fff;
         border: 1px solid var(--line);
-        border-radius: 999px;
-        padding: 9px 18px;
+        border-radius: 12px;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 76px;
+      }
+      .client-logo img {
+        max-width: 140px;
+        max-height: 44px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
       }
       .why[data-astro-cid-ebj2y6yc] {
         background: var(--paper-alt);
@@ -1460,23 +1483,25 @@
         font-size: 14.5px;
         margin: 0;
       }
-      .prod-group {
-        margin-top: 34px;
+      .prod-carousel-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
-      .prod-group-title {
-        font-family: var(--font-mono);
-        font-size: 12px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--blue-600);
-        margin: 0 0 14px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--line);
-      }
-      .prod-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      .prod-carousel {
+        display: flex;
         gap: 16px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 6px 2px 18px;
+        flex: 1;
+        scroll-padding-left: 2px;
+      }
+      .prod-carousel::-webkit-scrollbar {
+        display: none;
       }
       .prod-card {
         background: var(--paper-alt);
@@ -1489,10 +1514,63 @@
         transition:
           border-color 0.2s,
           transform 0.2s;
+        flex: 0 0 auto;
+        width: 230px;
+        scroll-snap-align: start;
       }
       .prod-card:hover {
         border-color: var(--cyan-400);
         transform: translateY(-2px);
+      }
+      .prod-type {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--blue-600);
+        background: rgba(1, 116, 178, 0.08);
+        border-radius: 6px;
+        padding: 3px 8px;
+        align-self: flex-start;
+      }
+      .carousel-btn {
+        flex: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--line-strong);
+        background: var(--paper);
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .carousel-btn:hover {
+        border-color: var(--cyan-400);
+        background: var(--paper-alt);
+      }
+      .carousel-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .carousel-counter {
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--ink-dim);
+        margin-top: 4px;
+      }
+      @media (max-width: 700px) {
+        .carousel-btn {
+          display: none;
+        }
+        .prod-card {
+          width: 72vw;
+        }
       }
       .prod-top {
         display: flex;
@@ -1657,14 +1735,49 @@
           { threshold: 0.6 },
         ).observe(t);
       } else t && (t.textContent = t.dataset.count + "+");
-      document.querySelectorAll(".faq-item").forEach((e) => {
+      (document.querySelectorAll(".faq-item").forEach((e) => {
         e.addEventListener("toggle", () => {
           e.open &&
             document.querySelectorAll(".faq-item").forEach((t) => {
               t !== e && (t.open = !1);
             });
         });
-      });
+      }),
+        (function () {
+          const e = document.getElementById("prodCarousel");
+          if (!e) return;
+          const t = document.querySelector(".carousel-btn.prev"),
+            n = document.querySelector(".carousel-btn.next"),
+            r = document.getElementById("carouselIndex"),
+            o = e.querySelectorAll(".prod-card"),
+            s = o.length;
+          function c() {
+            return o[0] ? o[0].getBoundingClientRect().width + 16 : 250;
+          }
+          (t &&
+            t.addEventListener("click", () =>
+              e.scrollBy({ left: -c(), behavior: "smooth" }),
+            ),
+            n &&
+              n.addEventListener("click", () =>
+                e.scrollBy({ left: c(), behavior: "smooth" }),
+              ));
+          let l = !1;
+          e.addEventListener(
+            "scroll",
+            () => {
+              l ||
+                ((l = !0),
+                requestAnimationFrame(() => {
+                  const t = Math.round(e.scrollLeft / c());
+                  (r &&
+                    (r.textContent = String(Math.min(s, Math.max(1, t + 1)))),
+                    (l = !1));
+                }));
+            },
+            { passive: !0 },
+          );
+        })());
     </script>
     <script type="module">
       const d = new Set(),
@@ -2394,18 +2507,32 @@
             </div>
           </div>
         </div>
-        <div class="catalog-head">
-          <span class="eyebrow on-light">Catálogo</span>
-          <h3>Equipos disponibles</h3>
-          <p>
-            Precios a consultar — te confirmamos disponibilidad y valor
-            actualizado por WhatsApp.
-          </p>
+      </section>
+      <section id="catalogo">
+        <div class="wrap">
+          <div class="catalog-head">
+            <span class="eyebrow on-light">Catálogo</span>
+            <h3>Equipos disponibles</h3>
+            <p>
+              Precios a consultar — te confirmamos disponibilidad y valor
+              actualizado por WhatsApp. Deslizá para ver todos los modelos.
+            </p>
+          </div>
         </div>
-        <div class="prod-group">
-          <h4 class="prod-group-title">Split On/Off</h4>
-          <div class="prod-grid">
+        <div class="prod-carousel-wrap">
+          <button type="button" class="carousel-btn prev" aria-label="Anterior">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+            >
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
+          <div class="prod-carousel" id="prodCarousel">
             <div class="prod-card">
+              <span class="prod-type">Split On/Off</span>
               <div class="prod-top">
                 <span class="prod-brand">Noblex</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2428,6 +2555,7 @@
               >
             </div>
             <div class="prod-card">
+              <span class="prod-type">Split On/Off</span>
               <div class="prod-top">
                 <span class="prod-brand">Noblex</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2450,6 +2578,7 @@
               >
             </div>
             <div class="prod-card">
+              <span class="prod-type">Split On/Off</span>
               <div class="prod-top">
                 <span class="prod-brand">Noblex</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2471,12 +2600,8 @@
                 >Consultar por WhatsApp</a
               >
             </div>
-          </div>
-        </div>
-        <div class="prod-group">
-          <h4 class="prod-group-title">Split Inverter</h4>
-          <div class="prod-grid">
             <div class="prod-card">
+              <span class="prod-type">Split Inverter</span>
               <div class="prod-top">
                 <span class="prod-brand">Philco</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2499,6 +2624,7 @@
               >
             </div>
             <div class="prod-card">
+              <span class="prod-type">Split Inverter</span>
               <div class="prod-top">
                 <span class="prod-brand">Noblex</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2521,6 +2647,7 @@
               >
             </div>
             <div class="prod-card">
+              <span class="prod-type">Split Inverter</span>
               <div class="prod-top">
                 <span class="prod-brand">Philco Pure Energy</span
                 ><span class="prod-origin origin-cn">China</span>
@@ -2543,6 +2670,7 @@
               >
             </div>
             <div class="prod-card">
+              <span class="prod-type">Split Inverter</span>
               <div class="prod-top">
                 <span class="prod-brand">Philco</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2565,6 +2693,7 @@
               >
             </div>
             <div class="prod-card">
+              <span class="prod-type">Split Inverter</span>
               <div class="prod-top">
                 <span class="prod-brand">Noblex</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2586,12 +2715,8 @@
                 >Consultar por WhatsApp</a
               >
             </div>
-          </div>
-        </div>
-        <div class="prod-group">
-          <h4 class="prod-group-title">Ventana</h4>
-          <div class="prod-grid">
             <div class="prod-card">
+              <span class="prod-type">Ventana</span>
               <div class="prod-top">
                 <span class="prod-brand">Philco</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2614,6 +2739,7 @@
               >
             </div>
             <div class="prod-card">
+              <span class="prod-type">Ventana</span>
               <div class="prod-top">
                 <span class="prod-brand">Philco</span
                 ><span class="prod-origin origin-ar">Argentina</span>
@@ -2636,6 +2762,23 @@
               >
             </div>
           </div>
+          <button
+            type="button"
+            class="carousel-btn next"
+            aria-label="Siguiente"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+            >
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+        <div class="carousel-counter">
+          <span id="carouselIndex">1</span> / 10
         </div>
       </section>
       <section id="trayectoria" data-astro-cid-2vnzffnj>
@@ -2655,14 +2798,47 @@
               licitaciones públicas y contrataciones directas para el Estado.
             </p>
           </div>
-          <div class="clients-row" data-astro-cid-2vnzffnj>
-            <span class="client-chip" data-astro-cid-2vnzffnj>Cía Mega SA</span
-            ><span class="client-chip" data-astro-cid-2vnzffnj
-              >Cooperativa Obrera</span
-            ><span class="client-chip" data-astro-cid-2vnzffnj>ACBSA</span
-            ><span class="client-chip" data-astro-cid-2vnzffnj
-              >Base Comandante Espora</span
-            >
+          <div class="clients-row">
+            <div class="client-logo">
+              <img
+                src="assets/clientes/cia-mega-sa.webp"
+                alt="Cía Mega SA"
+                loading="lazy"
+                decoding="async"
+                width="420"
+                height="199"
+              />
+            </div>
+            <div class="client-logo">
+              <img
+                src="assets/clientes/cooperativa-obrera.webp"
+                alt="Cooperativa Obrera"
+                loading="lazy"
+                decoding="async"
+                width="194"
+                height="71"
+              />
+            </div>
+            <div class="client-logo">
+              <img
+                src="assets/clientes/acbsa.webp"
+                alt="ACBSA — Acondicionadora Cereales Bahía"
+                loading="lazy"
+                decoding="async"
+                width="201"
+                height="56"
+              />
+            </div>
+            <div class="client-logo">
+              <img
+                src="assets/clientes/base-comandante-espora.webp"
+                alt="Base Aeronaval Comandante Espora"
+                loading="lazy"
+                decoding="async"
+                width="260"
+                height="265"
+              />
+            </div>
           </div>
         </div>
       </section>
